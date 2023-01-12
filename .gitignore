@@ -1,0 +1,11 @@
+.vs
+go.work
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+**/data
