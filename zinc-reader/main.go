@@ -177,10 +177,8 @@ func getZincSearchMailIndexName() string {
 	return "enron-index"
 }
 func getZincSearchUser() string {
-	log.Printf("user: %v", os.Getenv("ZINC_FIRST_ADMIN_USER"))
-	return os.Getenv("ZINC_FIRST_ADMIN_USER")
+	return "admin"
 }
 func getZincSearchPassword() string {
-	log.Printf("pass: %v", os.Getenv("ZINC_FIRST_ADMIN_PASSWORD"))
-	return os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
+	return "Complexpass#123"
 }
