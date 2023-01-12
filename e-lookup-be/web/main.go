@@ -31,7 +31,7 @@ func searchWord(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	word := query.Get("word")
 	page, _ := strconv.Atoi(query.Get("page"))
-	maxResults, _ := strconv.Atoi(query.Get("max_results"))
+	maxResults, _ := strconv.Atoi(query.Get("max_per_page"))
 
 	queryResult := wrapper.SearchByWord(word, page, maxResults)
 	render.JSON(w, r, queryResult)

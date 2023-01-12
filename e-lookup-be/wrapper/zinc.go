@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -37,22 +36,13 @@ type HitsSummary struct {
 	ItemSource Email  `json:"_source"`
 }
 
-// Minimal
-type Email struct {
-	Id      string   `json:"id"`
-	From    string   `json:"sender"`
-	To      []string `json:"recipient"`
-	Subject string   `json:"subject"`
-	Message string   `json:"message"`
-}
-
 type EmailHits struct {
 	Total  int     `json:"total"`
 	Emails []Email `json:"emails"`
 }
 
 func SearchByWord(term string, from int, maxResult int) EmailHits {
-	url := getZincSearchServerURL() + "enron" + "/_search"
+	url := getZincSearchServerURL() + "enron-index" + "/_search"
 
 	queryBody := ZincSearchQueryRequest{
 		SearchType: "matchphrase",
@@ -88,10 +78,12 @@ func MapResponseToMails(hitsValues ZincSearchQueryResponse) EmailHits {
 	mails := []Email{}
 	for _, item := range hitsValues.Hits.HitsSummary {
 		mails = append(mails, Email{
-			Id:      item.Id,
-			Subject: item.ItemSource.Subject,
-			From:    item.ItemSource.From,
-			To:      item.ItemSource.To,
+			MessageId: item.Id,
+			Date:      item.ItemSource.Date,
+			From:      item.ItemSource.From,
+			To:        item.ItemSource.To,
+			Subject:   item.ItemSource.Subject,
+			Content:   item.ItemSource.Content,
 		})
 	}
 	return EmailHits{
@@ -101,11 +93,14 @@ func MapResponseToMails(hitsValues ZincSearchQueryResponse) EmailHits {
 }
 
 func getZincSearchServerURL() string {
-	return os.Getenv("ZINC_SEARCH_SERVER_URL")
+	return "http://localhost:4080/api/"
+	// return os.Getenv("ZINC_SEARCH_SERVER_URL")
 }
 func getZincSearchUser() string {
-	return os.Getenv("ZINC_SEARCH_USER")
+	return "admin"
+	// return os.Getenv("ZINC_SEARCH_USER")
 }
 func getZincSearchPassword() string {
-	return os.Getenv("ZINC_SEARCH_PASSWORD")
+	return "Complexpass#123"
+	// return os.Getenv("ZINC_SEARCH_PASSWORD")
 }
