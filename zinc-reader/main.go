@@ -41,9 +41,12 @@ func parseArgs() (string, int, int) {
 	}
 
 	// Optional args
-	maxMailsToProcess, err := strconv.Atoi(os.Args[2])
+	var maxMailsToProcess int
+	if len(os.Args[3]) > 3 {
+		maxMailsToProcess, err = strconv.Atoi(os.Args[3])
+	}
 	if err != nil {
-		maxMailsToProcess = 0
+		maxMailsToProcess = -1
 	}
 
 	return rootPath, bulkSize, maxMailsToProcess
