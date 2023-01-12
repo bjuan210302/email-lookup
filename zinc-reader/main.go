@@ -42,7 +42,7 @@ func parseArgs() (string, int, int) {
 
 	// Optional args
 	var maxMailsToProcess int
-	if len(os.Args[3]) > 3 {
+	if len(os.Args) > 3 {
 		maxMailsToProcess, err = strconv.Atoi(os.Args[3])
 	}
 	if err != nil {
