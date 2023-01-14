@@ -6,52 +6,30 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	m "elookup/wrapper/model"
 )
 
-type QueryOptions struct {
-	Term string `json:"term"`
+type _QueryHits struct {
+	TotalHits int       `json:"totalHits"`
+	Hits      []m.Email `json:"hits"`
 }
 
-// Minimal query
-type ZincSearchQueryRequest struct {
-	SearchType string       `json:"search_type"`
-	Query      QueryOptions `json:"query"`
-	From       int          `json:"from,omitempty"`
-	MaxResults int          `json:"max_results,omitempty"`
-	Source     []string     `json:"_source,omitempty"`
-}
-
-type ZincSearchQueryResponse struct {
-	Hits struct {
-		Total struct {
-			Value int `json:"value"`
-		} `json:"total"`
-		MaxScore    float32       `json:"max_score"`
-		HitsSummary []HitsSummary `json:"hits"`
-	} `json:"hits"`
-}
-
-type HitsSummary struct {
-	Id         string `json:"_id"`
-	ItemSource Email  `json:"_source"`
-}
-
-type EmailHits struct {
-	Total  int     `json:"total"`
-	Emails []Email `json:"emails"`
-}
-
-func SearchByWord(term string, from int, maxResult int) EmailHits {
+func SearchByWord(term string, from int, maxResult int) _QueryHits {
 	url := getZincSearchServerURL() + "enron-index" + "/_search"
 
-	queryBody := ZincSearchQueryRequest{
+	queryBody := m.ZincSearchQueryRequest{
 		SearchType: "matchphrase",
-		Query: QueryOptions{
+		Query: m.ZincQuery{
 			Term: term,
 		},
 		From:       from * maxResult,
 		MaxResults: maxResult,
-		Source:     []string{},
+		Fields:     []string{},
+		Highlight: m.ZincHighlight{
+			PreTags:  []string{},
+			PostTags: []string{},
+		},
 	}
 
 	rqbody, _ := json.Marshal(queryBody)
@@ -69,26 +47,27 @@ func SearchByWord(term string, from int, maxResult int) EmailHits {
 
 	log.Println(res.StatusCode)
 	queryResponse, _ := io.ReadAll(res.Body)
-	data := ZincSearchQueryResponse{}
+	data := m.ZincSearchQueryResponse{}
 	json.Unmarshal([]byte(queryResponse), &data)
 	return MapResponseToMails(data)
 }
 
-func MapResponseToMails(hitsValues ZincSearchQueryResponse) EmailHits {
-	mails := []Email{}
-	for _, item := range hitsValues.Hits.HitsSummary {
-		mails = append(mails, Email{
-			MessageId: item.Id,
-			Date:      item.ItemSource.Date,
-			From:      item.ItemSource.From,
-			To:        item.ItemSource.To,
-			Subject:   item.ItemSource.Subject,
-			Content:   item.ItemSource.Content,
+func MapResponseToMails(zincResponse m.ZincSearchQueryResponse) _QueryHits {
+	mails := []m.Email{}
+	for _, item := range zincResponse.Hits.ActualEmails {
+		mails = append(mails, m.Email{
+			Id:        item.Id,
+			Date:      item.Source.Date,
+			From:      item.Source.From,
+			To:        item.Source.To,
+			Subject:   item.Source.Subject,
+			Content:   item.Source.Content,
+			Highlight: item.Source.Highlight,
 		})
 	}
-	return EmailHits{
-		Total:  hitsValues.Hits.Total.Value,
-		Emails: mails,
+	return _QueryHits{
+		TotalHits: zincResponse.Hits.Total.Value,
+		Hits:      mails,
 	}
 }
 
