@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"net/mail"
 	"os"
 	"path/filepath"
@@ -13,11 +11,13 @@ import (
 	"strings"
 
 	"zincreader/model"
+	"zincreader/wrapper"
 )
 
 func main() {
 	rootPath, bulkSize, maxMailsToProcess := parseArgs()
 	mailsPaths := collectMailsPaths(rootPath, maxMailsToProcess)
+	wrapper.CheckAndCreateIndex()
 	ProcessFilesBatch(mailsPaths, bulkSize)
 }
 
@@ -80,7 +80,7 @@ func collectMailsPaths(rootPath string, maxMailsToProcess int) []string {
 
 func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 	total := len(mailsPaths)
-	log.Printf("Preparing to proccess files.\nBulk size: %v. Total records: %v", bulkSize, total)
+	log.Printf("Preparing to proccess files.  Bulk size: %v. Total records: %v", bulkSize, total)
 
 	var bulk []model.Email
 	for i, item := range mailsPaths {
@@ -92,11 +92,11 @@ func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 
 		if (i+1)%bulkSize == 0 { // Upload bulk and start over
 			log.Printf("Uploading bulk %v / %v", i+1, total)
-			saveBulk(bulk)
+			wrapper.SaveBulk(bulk)
 			bulk = nil
 		} else if bulk != nil && (i+1) == total { // Upload last bulk
 			log.Printf("Uploading bulk %v / %v", i+1, total)
-			saveBulk(bulk)
+			wrapper.SaveBulk(bulk)
 		}
 	}
 }
@@ -134,54 +134,4 @@ func parseEmailFromPath(path string) (model.Email, error) {
 	}
 
 	return mail, nil
-}
-
-func saveBulk(mails []model.Email) {
-	// Using bulk v2 as it is more confortable than bulk
-	url := getZincSearchAPIURL() + "_bulkv2"
-	name := getZincSearchMailIndexName()
-	bulk := struct {
-		IndexName string `json:"index"`
-		Records   any    `json:"records"`
-	}{
-		IndexName: name,
-		Records:   mails,
-	}
-	bulkJson, err := json.Marshal(bulk)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Print("Posting to Zinc server")
-	req, err := http.NewRequest("POST", url, strings.NewReader(string(bulkJson)))
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.SetBasicAuth(getZincSearchUser(), getZincSearchPassword())
-	req.Header.Set("Content-Type", "application/json")
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-
-	log.Printf("Zinc server response code: %d", res.StatusCode)
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Zinc server response body: %s", string(resBody))
-}
-
-func getZincSearchAPIURL() string {
-	return "http://localhost:4080/api/"
-}
-func getZincSearchMailIndexName() string {
-	return "enron-index"
-}
-func getZincSearchUser() string {
-	return "admin"
-}
-func getZincSearchPassword() string {
-	return "Complexpass#123"
 }

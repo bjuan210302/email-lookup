@@ -1,5 +1,6 @@
-.vs
-go.work
+**/.vs
+**/.vscode
+**/go.work
 
 # Binaries for programs and plugins
 *.exe
@@ -9,3 +10,9 @@ go.work
 *.dylib
 
 **/data
+
+**/node_modules
+**/.DS_Store
+**/dist
+**/dist-ssr
+**/*.local
