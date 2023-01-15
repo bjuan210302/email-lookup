@@ -4,10 +4,10 @@ package model
 type ZincSearchQueryRequest struct {
 	SearchType string        `json:"search_type"`
 	Query      ZincQuery     `json:"query"`
-	From       int           `json:"from,omitempty"`
-	MaxResults int           `json:"max_results,omitempty"`
-	Fields     []string      `json:"_source,omitempty"`
-	Highlight  ZincHighlight `json:"highlight,omitempty"`
+	From       int           `json:"from"`
+	MaxResults int           `json:"max_results"`
+	Fields     []string      `json:"_source"`
+	Highlight  ZincHighlight `json:"highlight"`
 }
 
 type ZincQuery struct {
@@ -15,8 +15,7 @@ type ZincQuery struct {
 }
 
 type ZincHighlight struct {
-	PreTags  []string `json:"pre_tags,omitempty"`
-	PostTags []string `json:"post_tags,omitempty"`
+	Fields map[string]any `json:"fields"`
 }
 
 // RESPOSE

@@ -2,7 +2,7 @@ package main
 
 import (
 	"elookup/wrapper"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -23,7 +23,7 @@ func main() {
 		r.Get("/lookup", searchWord)
 	})
 
-	fmt.Println("Serving on port 3000")
+	log.Println("Serving on port 3000")
 	http.ListenAndServe(":3000", r)
 }
 

@@ -27,13 +27,16 @@ func SearchByWord(term string, from int, maxResult int) _QueryHits {
 		MaxResults: maxResult,
 		Fields:     []string{},
 		Highlight: m.ZincHighlight{
-			PreTags:  []string{},
-			PostTags: []string{},
+			Fields: map[string]any{
+				"content": map[string]any{},
+			},
 		},
 	}
 
 	rqbody, _ := json.Marshal(queryBody)
-	req, err := http.NewRequest("POST", url, strings.NewReader(string(rqbody)))
+	strRqBody := string(rqbody)
+	req, err := http.NewRequest("POST", url, strings.NewReader(strRqBody))
+	log.Println("Posting to Zinc. Query body:", strRqBody)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,8 +47,8 @@ func SearchByWord(term string, from int, maxResult int) _QueryHits {
 		log.Fatal(err)
 	}
 	defer res.Body.Close()
+	log.Printf("Zinc response code: %v", res.StatusCode)
 
-	log.Println(res.StatusCode)
 	queryResponse, _ := io.ReadAll(res.Body)
 	data := m.ZincSearchQueryResponse{}
 	json.Unmarshal([]byte(queryResponse), &data)
@@ -62,7 +65,7 @@ func MapResponseToMails(zincResponse m.ZincSearchQueryResponse) _QueryHits {
 			To:        item.Source.To,
 			Subject:   item.Source.Subject,
 			Content:   item.Source.Content,
-			Highlight: item.Source.Highlight,
+			Highlight: item.Highlight.Content,
 		})
 	}
 	return _QueryHits{
