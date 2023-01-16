@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"zincreader/model"
@@ -147,9 +148,8 @@ func makeRequestWithAuth(method string, url string, body string) (*http.Request,
 		return nil, err
 	}
 
-	// TODO: replace with env variable
-	zincUser := "admin"
-	zincPass := "Complexpass#123"
+	zincUser := os.Getenv("ZINC_SEARCH_USER")
+	zincPass := os.Getenv("ZINC_SEARCH_PASSWORD")
 	req.SetBasicAuth(zincUser, zincPass)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -157,8 +157,8 @@ func makeRequestWithAuth(method string, url string, body string) (*http.Request,
 }
 
 func getZincSearchAPIURL() string {
-	return "http://localhost:4080/api/"
+	return os.Getenv("ZINC_SEARCH_SERVER_URL")
 }
 func getZincSearchMailIndexName() string {
-	return "enron-index"
+	return os.Getenv("ZINC_SEARCH_INDEX_NAME")
 }
