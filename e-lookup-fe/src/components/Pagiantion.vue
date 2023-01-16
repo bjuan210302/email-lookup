@@ -1,41 +1,31 @@
 <template>
-  <ul class="flex">
-    <li class="mx-1 px-3 py-2 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
-      <button class="flex items-center" @click="changePage(currentPage - 1)"
-        :disabled="currentPage - 1 < 0">Previous</button>
-    </li>
-    <li class="mx-1 px-3 py-2 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
-      <button>{{ currentPage+ 1}}</button>
-    </li>
-    <li class="mx-1 px-3 py-2 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
-      <button class="flex items-center" @click="changePage(currentPage + 1)"
-        :disabled="currentPage == maxPage - 1">Next</button>
-    </li>
-  </ul>
+  <div class="flex flex-col">
+    <ul class="flex">
+      <li class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
+        <button @click="emit('changePage', currentPage - 1)" :disabled="currentPage - 1 < 0">Previous</button>
+      </li>
+      <li class="mx-2 px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
+        <button>{{ currentPage + 1 }}/{{ numberOfPages }}</button>
+      </li>
+      <li class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
+        <button @click="emit('changePage', currentPage + 1)" :disabled="currentPage == numberOfPages - 1">Next</button>
+      </li>
+    </ul>
+    <small class="text-right text-gray-500">Total found: {{ totalResults }}</small>
+  </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { ref } from "vue";
+defineProps<{
+  currentPage: number,
+  resultsPerPage: number,
+  numberOfPages: number,
+  totalResults: number,
+}>()
 
-export default {
-  setup() {
-    const currentPage = ref(0)
-    const maxResult = ref(5)
-    const maxPage = ref(0)
-
-    const paginator = (page: number) => {
-
-    }
-
-    return {
-      currentPage,
-      maxResult,
-      maxPage,
-      changePage: paginator
-    }
-
-  }
-}
+const emit = defineEmits<{
+  (e: 'changePage', page: number): void
+}>()
 
 </script>

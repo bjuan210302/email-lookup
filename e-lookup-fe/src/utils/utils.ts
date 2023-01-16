@@ -15,12 +15,12 @@ export type QueryHits = {
   hits: Email[]
 }
 
-export const makeQueryRequest = async (term: string) => {
+export const makeQueryRequest = async (term: string, page: number, maxPerPage: number) => {
   const query = BACKEND_API_URL + new URLSearchParams(
     {
       'word': term,
-      'page': '0',
-      'max_per_page': '10'
+      'page': String(page),
+      'max_per_page': String(maxPerPage)
     }
   )
   const res = await fetch(query, {
