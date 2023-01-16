@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  overflow-y: hidden;
+  margin: 0px;
+}
+#app {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
