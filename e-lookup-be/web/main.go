@@ -4,6 +4,7 @@ import (
 	"elookup/wrapper"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -30,10 +31,12 @@ func main() {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/lookup", searchWord)
+		r.Get("/ping", ping)
 	})
 
-	log.Println("Serving on port 3000")
-	http.ListenAndServe(":3000", r)
+	port := os.Getenv("LOOKUP_BE_PORT")
+	log.Printf("Serving on port %s", port)
+	http.ListenAndServe(":"+port, r)
 }
 
 func searchWord(w http.ResponseWriter, r *http.Request) {
@@ -44,4 +47,9 @@ func searchWord(w http.ResponseWriter, r *http.Request) {
 
 	queryResult := wrapper.SearchByWord(word, page, maxResults)
 	render.JSON(w, r, queryResult)
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Pong!"))
 }

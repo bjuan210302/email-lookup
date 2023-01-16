@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	m "elookup/wrapper/model"
@@ -16,7 +17,7 @@ type _QueryHits struct {
 }
 
 func SearchByWord(term string, from int, maxResult int) _QueryHits {
-	url := getZincSearchServerURL() + "enron-index" + "/_search"
+	url := getZincSearchServerURL() + getZincSearchIndexName() + "/_search"
 
 	queryBody := m.ZincSearchQueryRequest{
 		SearchType: "matchphrase",
@@ -36,6 +37,7 @@ func SearchByWord(term string, from int, maxResult int) _QueryHits {
 	rqbody, _ := json.Marshal(queryBody)
 	strRqBody := string(rqbody)
 	req, err := http.NewRequest("POST", url, strings.NewReader(strRqBody))
+	log.Println("Posting to Zinc. Query link:", url)
 	log.Println("Posting to Zinc. Query body:", strRqBody)
 	if err != nil {
 		log.Fatal(err)
@@ -75,14 +77,14 @@ func MapResponseToMails(zincResponse m.ZincSearchQueryResponse) _QueryHits {
 }
 
 func getZincSearchServerURL() string {
-	return "http://localhost:4080/api/"
-	// return os.Getenv("ZINC_SEARCH_SERVER_URL")
+	return os.Getenv("ZINC_SEARCH_SERVER_URL")
 }
 func getZincSearchUser() string {
-	return "admin"
-	// return os.Getenv("ZINC_SEARCH_USER")
+	return os.Getenv("ZINC_SEARCH_USER")
 }
 func getZincSearchPassword() string {
-	return "Complexpass#123"
-	// return os.Getenv("ZINC_SEARCH_PASSWORD")
+	return os.Getenv("ZINC_SEARCH_PASSWORD")
+}
+func getZincSearchIndexName() string {
+	return os.Getenv("ZINC_SEARCH_INDEX_NAME")
 }
