@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <ul class="flex">
+    <ul class="flex justify-end">
       <li class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-gray-200 rounded-sm">
         <button @click="emit('changePage', currentPage - 1)" :disabled="currentPage - 1 < 0">Previous</button>
       </li>

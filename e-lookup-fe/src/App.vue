@@ -6,20 +6,28 @@
     <!-- SEARCH HEADER -->
     <div class="sticky top-0 px-5 py-5 bg-gray-100">
       <div class="flex justify-between items-center">
-        <div class="relative min-w-[50%]">
-          <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+
+        <div class="min-w-[50%]">
+          <div class="relative min-w-full mb-1">
+            <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input type="text" @keyup.enter="() => search()" v-model="termSearch"
+              class="block p-3 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-md border border-gray-300"
+              placeholder="Search for content">
+            <button @click="() => search()"
+              class="text-white absolute right-1 bottom-1 top-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2">Search</button>
           </div>
-          <input type="text" @keyup.enter="() => search()" v-model="termSearch"
-            class="block p-3 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-md border border-gray-300"
-            placeholder="Search for content">
-          <button @click="() => search()"
-            class="text-white absolute right-1 bottom-1 top-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2">Search</button>
+          <div>
+            <label class="mx-3 text-gray-500 text-xs">Results per page:</label>
+            <input type="number" class="w-10 pl-2 text-sm text-gray-500" v-model.number="resultsPerPage">
+          </div>
         </div>
+
         <Pagination :currentPage="currentPage" :resultsPerPage="resultsPerPage" :numberOfPages="numberOfPages"
           :totalResults="totalResults" @changePage="(newPage) => updatePage(newPage)" />
       </div>
@@ -62,7 +70,7 @@ const totalResults = ref(0)
 
 const search = async (resetPage: boolean = true) => {
   const { hits, totalHits } = await makeQueryRequest(termSearch.value, currentPage.value, resultsPerPage.value)
-  console.log(hits)
+
   let calcPages = Math.trunc(totalHits / resultsPerPage.value)
   if (totalHits % resultsPerPage.value !== 0) {
     calcPages++
