@@ -2,9 +2,9 @@ package main
 
 import (
 	"elookup/wrapper"
+	"flag"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -12,6 +12,15 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 )
+
+var (
+	port *string
+)
+
+func init() {
+	port = flag.String("port", "3000", "port number")
+	flag.Parse()
+}
 
 func main() {
 	r := chi.NewRouter()
@@ -34,9 +43,8 @@ func main() {
 		r.Get("/ping", ping)
 	})
 
-	port := os.Getenv("LOOKUP_BE_PORT")
-	log.Printf("Serving on port %s", port)
-	http.ListenAndServe(":"+port, r)
+	log.Printf("Serving on port %s", *port)
+	http.ListenAndServe(":"+*port, r)
 }
 
 func searchWord(w http.ResponseWriter, r *http.Request) {

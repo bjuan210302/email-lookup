@@ -1,55 +1,35 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"io"
 	"log"
 	"net/mail"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"zincreader/model"
 	"zincreader/wrapper"
 )
 
-func main() {
-	rootPath, bulkSize, maxMailsToProcess := parseArgs()
-	mailsPaths := collectMailsPaths(rootPath, maxMailsToProcess)
-	wrapper.CheckAndCreateIndex()
-	ProcessFilesBatch(mailsPaths, bulkSize)
+var (
+	dataRootPath      *string
+	bulkSize          *int
+	maxMailsToProcess *int
+)
+
+func init() {
+	dataRootPath = flag.String("data_path", "data", "Root of emails to load")
+	bulkSize = flag.Int("bulk_size", 1000, "Size of ZincSearch upload bulk")
+	maxMailsToProcess = flag.Int("max_mails", -1, "Limit of emails to upload")
+	flag.Parse()
 }
 
-func parseArgs() (string, int, int) {
-	if len(os.Args) < 3 {
-		panic("Two arguments required: root of mails (path) and bulk size (int)")
-	}
-
-	rootPath := os.Args[1]
-	pathInfo, err := os.Stat(rootPath)
-	if err != nil || !pathInfo.IsDir() {
-		if err != nil {
-			panic(fmt.Sprintf("Error while reading directory %s: %v", rootPath, err))
-		}
-		panic("Error: " + rootPath + " not is a directory.")
-	}
-
-	bulkSize, err := strconv.Atoi(os.Args[2])
-	if err != nil {
-		panic(fmt.Sprintf("Error parsing second arg %d: %v", bulkSize, err))
-	}
-
-	// Optional args
-	var maxMailsToProcess int
-	if len(os.Args) > 3 {
-		maxMailsToProcess, err = strconv.Atoi(os.Args[3])
-	}
-	if err != nil {
-		maxMailsToProcess = -1
-	}
-
-	return rootPath, bulkSize, maxMailsToProcess
+func main() {
+	mailsPaths := collectMailsPaths(*dataRootPath, *maxMailsToProcess)
+	wrapper.CheckAndCreateIndex()
+	ProcessFilesBatch(mailsPaths, *bulkSize)
 }
 
 func collectMailsPaths(rootPath string, maxMailsToProcess int) []string {
