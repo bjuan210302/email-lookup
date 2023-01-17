@@ -27,7 +27,7 @@ however it will NOT index the emails nor upload them to the ZincSearch server, t
 
 This app parses the raw files from the Enron Database and upload the emails to a ZincZearch index.
 
-## Build
+### Build
 
 * Environment variables
     ```bash
@@ -46,7 +46,7 @@ This app parses the raw files from the Enron Database and upload the emails to a
     go build -o zincreader
     ```
 
-## Usage
+### Usage
 
 ```bash
   #Example
@@ -63,7 +63,7 @@ This app parses the raw files from the Enron Database and upload the emails to a
 
 Small backend to wrap the ZincSearch API.
 
-## Build
+### Build
 
 Uses the same variables of `zinc-reader`
 * As `main.go` is not on root folder
@@ -73,7 +73,7 @@ Uses the same variables of `zinc-reader`
     go build -o elookup
     ```
 
-## Usage
+### Usage
 
 To get up and running use `./elookup --port {PORT}`. Port defaults to 3000 if not specified.
 
@@ -93,7 +93,7 @@ Query indexed emails on the ZincSearch server and get paginated resutls with
 
 A visualizer for the API wrapper. Build with Vue 3 and Tailwind. Uses Vite 3.
 
-## Run
+### Run
 
 Provide `.env` with backend link
   ```
