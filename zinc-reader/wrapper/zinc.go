@@ -51,18 +51,19 @@ func CheckAndCreateIndex() {
 	if res.StatusCode == 200 {
 		log.Printf("Index %s does exist. Checking if highlightable...", getZincSearchMailIndexName())
 		bodyBytes, _ := io.ReadAll(res.Body)
-		indexInfo := struct {
-			Index struct {
-				Mappings struct {
-					Properties map[string]struct {
-						Highlightable bool `json:"highlightable"`
-					} `json:"properties"`
-				} `json:"mappings"`
-			} `json:"enron-index"`
-		}{}
-		json.Unmarshal([]byte(bodyBytes), &indexInfo)
 
-		if !indexInfo.Index.Mappings.Properties["content"].Highlightable {
+		type IndexInfo struct {
+			Mappings struct {
+				Properties map[string]struct {
+					Highlightable bool `json:"highlightable"`
+				} `json:"properties"`
+			} `json:"mappings"`
+		}
+
+		index := make(map[string]IndexInfo)
+		json.Unmarshal([]byte(bodyBytes), &index)
+
+		if !index[getZincSearchMailIndexName()].Mappings.Properties["content"].Highlightable {
 			log.Print("Index is not highlightable, deleting index and creating again...")
 			deleteIndex()
 			createIndex()
