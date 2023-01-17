@@ -1,4 +1,4 @@
-const BACKEND_API_URL = "http://localhost:3000/api/v1/lookup?"
+const ELOOKUP_BACKEND_QUERY_URL = import.meta.env.VITE_ELOOKUP_BACKEND_QUERY_URL
 
 export type Email = {
   _id: string,
@@ -16,7 +16,7 @@ export type QueryHits = {
 }
 
 export const makeQueryRequest = async (term: string, page: number, maxPerPage: number) => {
-  const query = BACKEND_API_URL + new URLSearchParams(
+  const query = ELOOKUP_BACKEND_QUERY_URL + new URLSearchParams(
     {
       'word': term,
       'page': String(page),
