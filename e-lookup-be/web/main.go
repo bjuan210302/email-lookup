@@ -2,6 +2,8 @@ package main
 
 import (
 	"elookup/wrapper"
+	"elookup/wrapper/model"
+	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -33,9 +35,6 @@ func main() {
 	}))
 
 	r.Use(middleware.Logger)
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.URLFormat)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -44,8 +43,8 @@ func main() {
 		r.Get("/ping", ping)
 	})
 
-	log.Printf("Serving on port %s", *port)
-	http.ListenAndServe(":"+*port, r)
+	log.Printf("Starting on port %s...", *port)
+	log.Fatal(http.ListenAndServe(":"+*port, r))
 }
 
 func searchWord(w http.ResponseWriter, r *http.Request) {
@@ -57,18 +56,39 @@ func searchWord(w http.ResponseWriter, r *http.Request) {
 
 	auth := r.Header.Get("Authorization")
 
-	queryResult := wrapper.SearchByWord(word, page, maxResults, indexName, auth)
+	queryResult, err := wrapper.SearchByWord(word, page, maxResults, indexName, auth)
+	if err != nil {
+		handleWrapperError(err, w, r)
+		return
+	}
 	render.JSON(w, r, queryResult)
 }
 
 func allIndexNames(w http.ResponseWriter, r *http.Request) {
 	auth := r.Header.Get("Authorization")
 
-	names := wrapper.GetIndexNamesList(auth)
+	names, err := wrapper.GetIndexNamesList(auth)
+	if err != nil {
+		handleWrapperError(err, w, r)
+		return
+	}
 	render.JSON(w, r, names)
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Pong!"))
+}
+
+func handleWrapperError(err error, w http.ResponseWriter, r *http.Request) {
+	log.Print(err)
+	statusCode := http.StatusInternalServerError
+
+	var reqErr *model.RequestError
+	if errors.As(err, &reqErr) {
+		statusCode = reqErr.StatusCode
+	}
+
+	w.WriteHeader(statusCode)
+	render.JSON(w, r, err.Error())
 }
