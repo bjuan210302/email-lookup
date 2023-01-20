@@ -16,8 +16,8 @@ type _QueryHits struct {
 	Hits      []m.Email `json:"hits"`
 }
 
-func SearchByWord(term string, from int, maxResult int) _QueryHits {
-	url := getZincSearchServerURL() + getZincSearchIndexName() + "/_search"
+func SearchByWord(term string, from int, maxResult int, indexName string, auth string) _QueryHits {
+	url := getZincSearchServerURL() + indexName + "/_search"
 
 	queryBody := m.ZincSearchQueryRequest{
 		SearchType: "matchphrase",
@@ -42,7 +42,7 @@ func SearchByWord(term string, from int, maxResult int) _QueryHits {
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.SetBasicAuth(getZincSearchUser(), getZincSearchPassword())
+	req.Header.Set("Authorization", auth)
 	req.Header.Set("Content-Type", "application/json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -78,13 +78,4 @@ func MapResponseToMails(zincResponse m.ZincSearchQueryResponse) _QueryHits {
 
 func getZincSearchServerURL() string {
 	return os.Getenv("ZINC_SEARCH_SERVER_URL")
-}
-func getZincSearchUser() string {
-	return os.Getenv("ZINC_SEARCH_USER")
-}
-func getZincSearchPassword() string {
-	return os.Getenv("ZINC_SEARCH_PASSWORD")
-}
-func getZincSearchIndexName() string {
-	return os.Getenv("ZINC_SEARCH_INDEX_NAME")
 }
