@@ -76,6 +76,20 @@ func MapResponseToMails(zincResponse m.ZincSearchQueryResponse) _QueryHits {
 	}
 }
 
+func GetIndexNamesList(auth string) []string {
+	url := getZincSearchServerURL() + "index_name"
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", auth)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := http.DefaultClient.Do(req)
+
+	resBody, _ := io.ReadAll(res.Body)
+	indexNames := []string{}
+	json.Unmarshal(resBody, &indexNames)
+	return indexNames
+}
+
 func getZincSearchServerURL() string {
 	return os.Getenv("ZINC_SEARCH_SERVER_URL")
 }
