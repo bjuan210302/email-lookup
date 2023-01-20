@@ -15,20 +15,35 @@ export type QueryHits = {
   hits: Email[]
 }
 
-export const makeQueryRequest = async (term: string, page: number, maxPerPage: number) => {
+export type SearchConfig = {
+  zUser: string;
+  zPass: string;
+  zIndex: string;
+  resultsPerPage: number;
+}
+
+export const makeQueryRequest = async (term: string, page: number, config: SearchConfig) => {
+  const { zUser, zPass, zIndex, resultsPerPage } = config
   const query = ELOOKUP_BACKEND_QUERY_URL + new URLSearchParams(
     {
       'word': term,
       'page': String(page),
-      'max_per_page': String(maxPerPage)
+      'max_per_page': String(resultsPerPage),
+      'index_name': String(zIndex)
     }
   )
-  const res = await fetch(query, {
+  const { hits, totalHits } = await fetch(query, {
     method: 'get',
     headers: new Headers({
-      'Authorization': 'Basic ' + 'username:password',
+      'Authorization': `Basic ${zUser}:${zPass}`,
       'Content-Type': 'application/json'
     }),
-  })
-  return res.json() as Promise<QueryHits>
+  }).then(r => r.json() as Promise<QueryHits>)
+
+  let numPages = Math.trunc(totalHits / resultsPerPage)
+  if (totalHits % resultsPerPage !== 0) {
+    numPages++
+  }
+
+  return { hits, totalHits, numPages }
 }
