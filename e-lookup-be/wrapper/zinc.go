@@ -47,7 +47,6 @@ func SearchByWord(term string, from int, maxResult int, indexName string, auth s
 	}
 
 	req.Header.Set("Authorization", auth)
-	req.Header.Set("Content-Type", "application/json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -96,7 +95,6 @@ func GetIndexNamesList(auth string) ([]string, error) {
 	}
 
 	req.Header.Set("Authorization", auth)
-	req.Header.Set("Content-Type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
