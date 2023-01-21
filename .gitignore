@@ -2,7 +2,8 @@
 **/.vscode
 **/go.work
 
-zinc
+zinc-server/zinc
+.env
 
 # Binaries for programs and plugins
 *.exe
