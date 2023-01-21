@@ -3,11 +3,13 @@ FROM node:16-alpine
 WORKDIR /e-lookup-fe
 COPY . .
 
+ARG ELOOKUPBE_HOST=http://localhost:6002/
+RUN echo VITE_ELOOKUPBE_HOST=$ELOOKUPBE_HOST > .env
+
 #npm ci makes sure the exact versions in the lockfile gets installed
 RUN npm ci 
 RUN npm run build
 
-ENV VITE_ELOOKUPBE_HOST=http://localhost:3000/
 EXPOSE 3000
 
 CMD ["npx","serve","dist"]
