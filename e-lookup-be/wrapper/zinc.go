@@ -118,5 +118,5 @@ func GetIndexNamesList(auth string) ([]string, error) {
 }
 
 func getZincSearchServerURL() string {
-	return os.Getenv("ZINC_SEARCH_SERVER_URL")
+	return os.Getenv("ZINC_SERVER_HOST") + "api/"
 }
