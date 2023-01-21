@@ -1,3 +1,5 @@
+version: '3.1'
+
 services:
   zinc-server:
     build: ./zinc-server
@@ -9,13 +11,16 @@ services:
     ports:
       - "6002:3000"
     environment:
-      ZINC_SERVER_HOST: zinc-server:6001
-    links:
+      ZINC_SERVER_HOST: http://zinc-server:4080/
+    depends_on:
       - zinc-server
 
   e-lookup-fe:
-    build: ./e-lookup-fe
+    build:
+      context: ./e-lookup-fe
+      args:
+        ELOOKUPBE_HOST: http://localhost:6002/
     ports:
       - "6003:3000"
-    environment:
-      VITE_ELOOKUPBE_HOST: zinc-server:6002
+    depends_on:
+      - e-lookup-be
