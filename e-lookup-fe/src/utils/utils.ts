@@ -1,4 +1,4 @@
-const ELOOKUP_BACKEND_QUERY_URL = import.meta.env.VITE_ELOOKUP_BACKEND_QUERY_URL
+const ELOOKUP_BACKEND_QUERY_URL = import.meta.env.VITE_ELOOKUPBE_HOST + "api/v1/lookup?"
 
 export type Email = {
   _id: string,
