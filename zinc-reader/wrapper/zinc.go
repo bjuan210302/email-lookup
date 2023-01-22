@@ -34,7 +34,12 @@ func SaveBulk(mails []model.Email) {
 func CheckAndCreateIndex() {
 	log.Printf("Checking if index %s exists and is highlightable", getZincSearchMailIndexName())
 	url := getZincSearchAPIURL() + getZincSearchMailIndexName() + "/_mapping"
-	req, _ := makeRequestWithAuth("GET", url, "")
+	req, err := makeRequestWithAuth("GET", url, "")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -158,7 +163,7 @@ func makeRequestWithAuth(method string, url string, body string) (*http.Request,
 }
 
 func getZincSearchAPIURL() string {
-	return os.Getenv("ZINC_SEARCH_SERVER_URL")
+	return os.Getenv("ZINC_SEARCH_SERVER_URL") + "/api/"
 }
 func getZincSearchMailIndexName() string {
 	return os.Getenv("ZINC_SEARCH_INDEX_NAME")
