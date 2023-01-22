@@ -31,18 +31,25 @@ export const makeQueryRequest = async (term: string, page: number, config: Searc
     }
   )
 
-  const { hits, totalHits } = await fetch(query, {
+  const res = await fetch(query, {
     headers: new Headers({
       'Authorization': sessionStorage.getItem('auth') as string,
       'Content-Type': 'application/json'
     }),
-  }).then(r => r.json() as Promise<QueryHits>)
+  })
 
+  const body = await res.json()
+  if (res.status > 200) {
+    throw new Error(body)
+  } 
+
+  const { hits, totalHits } = body as QueryHits
   let numPages = Math.trunc(totalHits / resultsPerPage)
   if (totalHits % resultsPerPage !== 0) {
     numPages++
   }
-
+  
+  console.log('eche')
   return { hits, totalHits, numPages }
 }
 
@@ -56,23 +63,24 @@ export const getIndexes = async (auth?: string) => {
       'Content-Type': 'application/json'
     }),
   })
-  const body = await res.json() as string[]
 
-  return { res, body }
+  const body = await res.json()
+  if (res.status > 200) {
+    throw new Error(body)
+  } 
+
+  return body as string[]
 }
 
 export const zAuthenticate = async (zUser: string, zPass: string) => {
   const auth = `Basic ${btoa(`${zUser}:${zPass}`)}`
 
   // Using this to verify credentials
-  const { res, body } = await getIndexes(auth);
+  // If this doesn't raise an error then set the auth
+  const indexes = await getIndexes(auth);
+  sessionStorage.setItem('auth', auth)
+  sessionStorage.setItem('zUser', zUser)
+  sessionStorage.setItem('zPass', zPass)
 
-  if (res.status === 200) {
-    sessionStorage.setItem('auth', auth)
-    sessionStorage.setItem('zUser', zUser)
-    sessionStorage.setItem('zPass', zPass)
-    return { indexes: body }
-  }
-
-  return { error: body }
+  return indexes
 }
