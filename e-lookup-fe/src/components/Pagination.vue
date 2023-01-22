@@ -11,7 +11,7 @@
       </li>
       <li class="px-3 py-2 bg-gray-200 text-zinc-600 font-medium rounded-md
         hover:bg-gray-700 hover:text-neutral-200">
-        <button @click="emit('changePage', currentPage + 1)" :disabled="currentPage == numberOfPages - 1">Next</button>
+        <button @click="emit('changePage', currentPage + 1)" :disabled="currentPage >= numberOfPages - 1">Next</button>
       </li>
     </ul>
     <small class="text-right text-zinc-500">Total found: {{ totalResults }}</small>

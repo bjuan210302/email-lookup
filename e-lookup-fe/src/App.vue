@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 
-import Pagination from "./components/Pagiantion.vue"
+import Pagination from "./components/Pagination.vue"
 import SmallEmail from "./components/EmailMiniView.vue"
 import ExpandedEmail from "./components/EmailExpandedView.vue"
 import ConfigModal from "./components/modals/ConfigModal.vue"
