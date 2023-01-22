@@ -1,4 +1,4 @@
-const ELOOKUP_BACKEND_QUERY_URL = import.meta.env.VITE_ELOOKUPBE_HOST + "api/v1/lookup?"
+const ELOOKUP_HOST = import.meta.env.VITE_ELOOKUPBE_HOST + "api/v1"
 
 export type Email = {
   _id: string,
@@ -16,15 +16,13 @@ export type QueryHits = {
 }
 
 export type SearchConfig = {
-  zUser: string;
-  zPass: string;
   zIndex: string;
   resultsPerPage: number;
 }
 
 export const makeQueryRequest = async (term: string, page: number, config: SearchConfig) => {
-  const { zUser, zPass, zIndex, resultsPerPage } = config
-  const query = ELOOKUP_BACKEND_QUERY_URL + new URLSearchParams(
+  const { zIndex, resultsPerPage } = config
+  const query = ELOOKUP_HOST + "/lookup?" + new URLSearchParams(
     {
       'word': term,
       'page': String(page),
@@ -32,10 +30,10 @@ export const makeQueryRequest = async (term: string, page: number, config: Searc
       'index_name': String(zIndex)
     }
   )
+
   const { hits, totalHits } = await fetch(query, {
-    method: 'get',
     headers: new Headers({
-      'Authorization': `Basic ${zUser}:${zPass}`,
+      'Authorization': sessionStorage.getItem('auth') as string,
       'Content-Type': 'application/json'
     }),
   }).then(r => r.json() as Promise<QueryHits>)
@@ -46,4 +44,35 @@ export const makeQueryRequest = async (term: string, page: number, config: Searc
   }
 
   return { hits, totalHits, numPages }
+}
+
+export const getIndexes = async (auth?: string) => {
+  const link = ELOOKUP_HOST + "/indexes"
+  auth = auth || sessionStorage.getItem('auth') as string
+
+  const res = await fetch(link, {
+    headers: new Headers({
+      'Authorization': auth,
+      'Content-Type': 'application/json'
+    }),
+  })
+  const body = await res.json() as string[]
+
+  return { res, body }
+}
+
+export const zAuthenticate = async (zUser: string, zPass: string) => {
+  const auth = `Basic ${btoa(`${zUser}:${zPass}`)}`
+
+  // Using this to verify credentials
+  const { res, body } = await getIndexes(auth);
+
+  if (res.status === 200) {
+    sessionStorage.setItem('auth', auth)
+    sessionStorage.setItem('zUser', zUser)
+    sessionStorage.setItem('zPass', zPass)
+    return { indexes: body }
+  }
+
+  return { error: body }
 }

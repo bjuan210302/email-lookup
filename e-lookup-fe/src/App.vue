@@ -48,7 +48,7 @@
         No results found
       </div>
 
-      <SmallEmail v-for="(item, index) in results" :key="item._id" :_id="item._id" :subject="item.subject"
+      <SmallEmail v-if="totalResults > 0" v-for="(item, index) in results" :key="item._id" :_id="item._id" :subject="item.subject"
         :from="item.from" :to="item.to" :highlightedContent="item.highlight" @expandEmail="expandEmail(index)" />
     </div>
 
@@ -90,13 +90,11 @@ const numberOfPages = ref(0)
 const totalResults = ref(0)
 
 const searchConfig = ref({
-  zUser: 'xd',
-  zPass: 'xd2',
   zIndex: '',
   resultsPerPage: 10
 })
 
-const showConfigModal = ref(false)
+const showConfigModal = ref(sessionStorage.getItem('auth') == undefined)
 
 const search = async (resetPage: boolean = true) => {
   if (resetPage) currentPage.value = 0
