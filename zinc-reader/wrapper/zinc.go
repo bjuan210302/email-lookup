@@ -130,20 +130,23 @@ func deleteIndex() {
 func httpPOST(url string, body string) {
 	req, err := makeRequestWithAuth("POST", url, body)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return
 	}
 
 	log.Printf("Posting to: %s...", url)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return
 	}
 	defer res.Body.Close()
 
 	log.Printf("Zinc server response code: %d", res.StatusCode)
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return
 	}
 	log.Printf("Zinc server response body: %s", string(resBody))
 }
