@@ -7,6 +7,7 @@ import (
 	"net/mail"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"strings"
 
 	"zincreader/model"
@@ -17,19 +18,42 @@ var (
 	dataRootPath      *string
 	bulkSize          *int
 	maxMailsToProcess *int
+	profile           *bool
 )
 
 func init() {
 	dataRootPath = flag.String("data_path", "data", "Root of emails to load")
 	bulkSize = flag.Int("bulk_size", 1000, "Size of ZincSearch upload bulk")
 	maxMailsToProcess = flag.Int("max_mails", -1, "Limit of emails to upload")
+	profile = flag.Bool("profile", false, "write cpu profile to `file`")
 	flag.Parse()
 }
 
 func main() {
+
+	if *profile {
+		log.Print("Profiling enabled. Starting...")
+		file, err := os.Create("cpuprofile")
+		if err != nil {
+			log.Fatal("could not create file cpuprofile: ", err)
+		}
+		defer file.Close()
+
+		err = pprof.StartCPUProfile(file)
+		if err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+
+	}
+
 	mailsPaths := collectMailsPaths(*dataRootPath, *maxMailsToProcess)
 	wrapper.CheckAndCreateIndex()
 	ProcessFilesBatch(mailsPaths, *bulkSize)
+
+	if *profile {
+		log.Print("Stopping Profiling...")
+		defer pprof.StopCPUProfile()
+	}
 }
 
 func collectMailsPaths(rootPath string, maxMailsToProcess int) []string {
@@ -84,22 +108,19 @@ func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 func parseEmailFromPath(path string) (model.Email, error) {
 	fileContent, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatalf("Error reading file with path: %v", path)
-		log.Fatalln(err)
+		log.Print("Error reading file with path", path, err)
 		return model.Email{}, err
 	}
 	r := strings.NewReader(string(fileContent))
 	m, err := mail.ReadMessage(r)
 	if err != nil {
-		log.Fatalf("Error reading file with path: %v", path)
-		log.Fatalln(err)
+		log.Print("Error parsing file with path", path, err)
 		return model.Email{}, err
 	}
 	header := m.Header
 	body, err := io.ReadAll(m.Body)
 	if err != nil {
-		log.Fatalf("Error reading body of email with path: %v", path)
-		log.Fatalln(err)
+		log.Print("Error reading body of email with path", path, err)
 		return model.Email{}, err
 	}
 
