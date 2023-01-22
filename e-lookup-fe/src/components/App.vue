@@ -79,14 +79,14 @@
 
 <script setup lang="ts">
 
-import Pagination from "./components/Pagination.vue"
-import SmallEmail from "./components/EmailMiniView.vue"
-import ExpandedEmail from "./components/EmailExpandedView.vue"
-import ConfigModal from "./components/modals/ConfigModal.vue"
+import Pagination from "./Pagination.vue"
+import SmallEmail from "./EmailMiniView.vue"
+import ExpandedEmail from "./EmailExpandedView.vue"
+import ConfigModal from "./modals/ConfigModal.vue"
 import { ref } from "vue";
-import { Email, makeQueryRequest, SearchConfig } from "./utils/utils"
-import { useModal } from "./utils/hooks";
-import ErrorBoundary from "./components/modals/ErrorBoundary.vue";
+import { Email, makeQueryRequest, SearchConfig } from "../utils/utils"
+import { useModal } from "../utils/hooks";
+import ErrorBoundary from "./modals/ErrorBoundary.vue";
 
 const termSearch = ref("")
 const results = ref<Email[]>([])
