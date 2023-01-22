@@ -14,7 +14,6 @@
         <button @click="emit('changePage', currentPage + 1)" :disabled="currentPage >= numberOfPages - 1">Next</button>
       </li>
     </ul>
-    <small class="text-right text-zinc-500">Total found: {{ totalResults }}</small>
   </div>
 </template>
 

@@ -5,7 +5,7 @@
     <div class="basis-3/5 max-h-screen overflow-y-auto">
 
       <!-- HEADER -->
-      <div class="sticky top-0 px-5 py-5 bg-gray-100 border-solid border-b-2 border-gray-200">
+      <div class="flex flex-col sticky top-0 px-5 pt-5 pb-3 bg-gray-100 border-solid border-b-2 border-gray-200">
         <div class="flex justify-between items-center">
 
           <div class="flex items-center min-w-[50%]">
@@ -35,10 +35,10 @@
             </button>
           </div>
 
-
           <Pagination :currentPage="currentPage" :numberOfPages="numberOfPages" :totalResults="totalResults"
             @changePage="(newPage) => updatePage(newPage)" />
         </div>
+        <small class="text-right text-zinc-500 mr-1">Total found: {{ totalResults }}</small>
       </div>
 
       <!-- RESULTS -->
@@ -58,7 +58,7 @@
     </div>
 
     <!-- EXPANDED EMAIL-->
-    <div class="basis-2/5 top-0 p-4 px-5 bg-gray-100 overflow-y-auto
+    <div class="basis-2/5 top-0 bg-gray-50 overflow-y-auto
     border-solid border-l-2 border-gray-200">
 
       <span v-if="!selectedEmail._id" class="absolute top-[50%] right-0 w-2/5
