@@ -49,7 +49,6 @@ export const makeQueryRequest = async (term: string, page: number, config: Searc
     numPages++
   }
   
-  console.log('eche')
   return { hits, totalHits, numPages }
 }
 

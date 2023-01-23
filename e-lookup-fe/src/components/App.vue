@@ -60,7 +60,7 @@
       </div>
 
       <!-- DRAG -->
-      <div class="absolute top-0 min-h-screen w-2 cursor-e-resize -translate-x-1
+      <div class="absolute top-0 min-h-screen w-2 cursor-e-resize
       bg-blue-900/20 hover:bg-blue-800/50 transition-colors" :style="{ left: `${dividerPosition}%` }"
         @mousedown="() => toggleDragging(true)">
       </div>
@@ -139,7 +139,6 @@ const updatePage = (newPAge: number) => {
 }
 
 const updateConfig = (config: SearchConfig) => {
-  console.log(config)
   searchConfig.value = config;
 }
 
@@ -152,7 +151,6 @@ const handleDragging = (e: MouseEvent) => {
   }
 }
 const toggleDragging = (on: boolean) => {
-  console.log('toggleDragging')
   if (on) document.addEventListener('mousemove', handleDragging)
   else document.removeEventListener('mousemove', handleDragging)
 }
