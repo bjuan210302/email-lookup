@@ -7,8 +7,10 @@ import (
 	"net/mail"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/pprof"
 	"strings"
+	"sync"
 
 	"zincreader/model"
 	"zincreader/wrapper"
@@ -19,6 +21,7 @@ var (
 	bulkSize          *int
 	maxMailsToProcess *int
 	profile           *bool
+	wg                sync.WaitGroup
 )
 
 func init() {
@@ -48,8 +51,13 @@ func main() {
 
 	mailsPaths := collectMailsPaths(*dataRootPath, *maxMailsToProcess)
 	wrapper.CheckAndCreateIndex()
-	ProcessFilesBatch(mailsPaths, *bulkSize)
 
+	chunks := chunkEmails(mailsPaths)
+	wg.Add(len(chunks))
+	for _, chunk := range chunks {
+		go ProcessFilesBatch(chunk, *bulkSize)
+	}
+	wg.Wait()
 	if *profile {
 		log.Print("Stopping Profiling...")
 		defer pprof.StopCPUProfile()
@@ -82,6 +90,23 @@ func collectMailsPaths(rootPath string, maxMailsToProcess int) []string {
 	return mailsPaths
 }
 
+func chunkEmails(mailsPaths []string) [][]string {
+	var chunks [][]string
+
+	//Chunking depending on number of logical cores
+	numCPU := runtime.NumCPU()
+	numMails := len(mailsPaths)
+	chunkSize := (numMails + numCPU - 1) / numCPU
+	for i := 0; i < numMails; i += chunkSize {
+		end := i + chunkSize
+		if end > numMails {
+			end = numMails
+		}
+		chunks = append(chunks, mailsPaths[i:end])
+	}
+	return chunks
+}
+
 func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 	total := len(mailsPaths)
 	log.Printf("Preparing to proccess files.  Bulk size: %v. Total records: %v", bulkSize, total)
@@ -103,6 +128,7 @@ func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 			wrapper.SaveBulk(bulk)
 		}
 	}
+	wg.Done()
 }
 
 func parseEmailFromPath(path string) (model.Email, error) {
