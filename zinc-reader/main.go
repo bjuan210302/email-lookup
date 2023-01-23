@@ -106,13 +106,13 @@ func ProcessFilesBatch(mailsPaths []string, bulkSize int) {
 }
 
 func parseEmailFromPath(path string) (model.Email, error) {
-	fileContent, err := os.ReadFile(path)
+	fd, err := os.Open(path)
 	if err != nil {
 		log.Print("Error reading file with path", path, err)
 		return model.Email{}, err
 	}
-	r := strings.NewReader(string(fileContent))
-	m, err := mail.ReadMessage(r)
+	defer fd.Close()
+	m, err := mail.ReadMessage(fd)
 	if err != nil {
 		log.Print("Error parsing file with path", path, err)
 		return model.Email{}, err
