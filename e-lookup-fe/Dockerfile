@@ -3,7 +3,7 @@ FROM node:16-alpine
 WORKDIR /e-lookup-fe
 COPY . .
 
-ARG ELOOKUPBE_HOST=http://localhost:6002/
+ARG elookupbe_host=http://localhost:6002/
 RUN echo VITE_ELOOKUPBE_HOST=$ELOOKUPBE_HOST > .env
 
 #npm ci makes sure the exact versions in the lockfile gets installed

@@ -2,8 +2,10 @@ FROM busybox
 
 COPY ./zinc /zinc-bin
 
-ENV ZINC_FIRST_ADMIN_USER=admin
-ENV ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+ARG user=admin
+ARG pass=Complexpass#123
+ENV ZINC_FIRST_ADMIN_USER=$user
+ENV ZINC_FIRST_ADMIN_PASSWORD=$pass
 
 EXPOSE 4080
 
