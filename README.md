@@ -15,11 +15,11 @@ Your file structure should look like this:
   |- e-lookup-fe
   |- zinc-reader
   |- zinc-server
-    |- Dockerfile
-    |- zinc          <- The folder you download from ZincSearch
-      |- LICENSE
-      |- README.md
-      |- zinc        <- zinc executable
+      |- Dockerfile
+      |- zinc            <- The folder you download from ZincSearch
+          |- LICENSE
+          |- README.md
+          |- zinc        <- zinc executable
   ```
 
 Running `docker compose up` will set up the ZincSearch server, the backend of this app (e-lookup-be) and the frontend (e-lookup-fe) each one in a docker container, binding ports `6001`, `6002` and `6003` respectively. **This will NOT index the emails nor upload them to the ZincSearch server, that has to be done manually. Indexing the emails with `enron-indexer` is explained below.**
@@ -30,13 +30,6 @@ This app parses the raw files from the Enron Database and upload the emails to a
 
 ### Build
 
-* Environment variables
-    ```bash
-    export ZINC_SEARCH_SERVER_URL="http://localhost:4080/api/"
-    export ZINC_SEARCH_USER="admin"
-    export ZINC_SEARCH_PASSWORD="Complexpass#123"
-    export ZINC_SEARCH_INDEX_NAME="enron-index"
-    ```
 * Get dependencies
     ```bash
     go mod download
@@ -50,8 +43,12 @@ This app parses the raw files from the Enron Database and upload the emails to a
 ### Usage
 
 ```bash
-  #Example
-  ./zincreader --data_path "data/enron_mail_20110402" --bulk_size 500 --max_mails 15000
+export ZINC_SEARCH_SERVER_URL="http://localhost:4080/api/"
+export ZINC_SEARCH_USER="admin"
+export ZINC_SEARCH_PASSWORD="Complexpass#123"
+export ZINC_SEARCH_INDEX_NAME="enron-index"
+
+./zincreader --data_path "data/enron_mail_20110402" --bulk_size 500 --max_mails 15000
   ```
 
 * `data_path` Is the root directory that contains all the emails. Default is `data/`
