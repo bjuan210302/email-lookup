@@ -19,3 +19,8 @@ zinc-server/zinc
 **/dist
 **/dist-ssr
 **/*.local
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
