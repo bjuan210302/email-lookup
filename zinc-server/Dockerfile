@@ -1,6 +1,7 @@
 FROM busybox
 
-COPY ./zinc /zinc-bin
+WORKDIR "/zinc-bin"
+COPY ./zinc .
 
 ARG user=admin
 ARG pass=Complexpass#123
@@ -9,5 +10,4 @@ ENV ZINC_FIRST_ADMIN_PASSWORD=$pass
 
 EXPOSE 4080
 
-WORKDIR "/zinc-bin"
 CMD ["./zinc"]
