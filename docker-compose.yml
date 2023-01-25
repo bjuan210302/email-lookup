@@ -19,7 +19,7 @@ services:
     build:
       context: ./e-lookup-fe
       args:
-        ELOOKUPBE_HOST: http://localhost:6002/
+        elookupbe_host: ${ELOOKUPBE_REMOTE_HOST:-http://localhost:6002/}
     ports:
       - "6003:3000"
     depends_on:

@@ -4,7 +4,7 @@ WORKDIR /e-lookup-fe
 COPY . .
 
 ARG elookupbe_host=http://localhost:6002/
-RUN echo VITE_ELOOKUPBE_HOST=$ELOOKUPBE_HOST > .env
+RUN echo VITE_ELOOKUPBE_HOST=$elookupbe_host > .env
 
 #npm ci makes sure the exact versions in the lockfile gets installed
 RUN npm ci 
